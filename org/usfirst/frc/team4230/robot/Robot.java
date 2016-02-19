@@ -255,41 +255,9 @@ public class Robot extends IterativeRobot {
 		 * if(joystick.getRawButton(YBUTTON) ||
 		 * joystick2.getRawButton(YBUTTON)){ arm.set(-2.0); }else{
 		 * arm.set(arm.getPosition()); }
-		 */ // drive.arcadeDrive(joystick.getY() * .75, joystick.getX() * .75);
-			// if(joystick.getRawButton(LTRIGGER)){
-			// speed++;
-			// }else if(joystick.getRawButton(RTRIGGER)){
-			// speed--;
-			// }
-		// arm.set(0.1 + (speed *.01));
-		// System.out.println(arm.get());
-
-		// leftfront.set(joystick.getY());
-		// leftback.set(joystick.getY());
-		// rightfront.set(joystick.getThrottle());
-		// rightback.set(joystick.getThrottle());
-		// double axis = joystick.getY();
-		// thing.set(axis);
-		// thing.changeControlMode(TalonControlMode.Position);
-		// thing.setPosition(0);
-		// int count = thingy.get();
-		// boolean cont = true;
-		// if(count == 0){
-		// cont = false;
-		// }
-		// while(cont){
-		// int counta = thingy.get();
-		// Timer.delay(1);
-		// int countb = thingy.get();
-		// int rate = countb - counta;
-		// System.out.println(rate);
-		// if(rate == 255){
-		// cont = false;
-		// }
-		// }
-		// System.out.println(count);
-		// System.out.println(armposenc.getRate());
-		// pickup.set(joystick2.getY());
+		 */
+		drive.arcadeDrive(joystick.getY() * .75, joystick.getX() * .75);
+		
 		if (joystick2.getRawButton(RTRIGGER)) {
 			kicker.set(-1);
 		} else {
@@ -299,15 +267,9 @@ public class Robot extends IterativeRobot {
 		if (joystick2.getRawButton(LTRIGGER)) {
 			shooterright.set(1);
 			shooterleft.set(-1);
-			// thing.set(1);
-			// kicker.set(0);
-
 		} else if (joystick2.getRawButton(LBUMPER)) {
-			// arm2.set(true);
 			shooterright.set(-.4);
 			shooterleft.set(.4);
-			// thing.set(-1);
-			// kicker.set(1);
 		} else if (joystick.getRawButton(RBUMPER)) {
 			shifter1.set(false);
 			shifter2.set(true);
@@ -316,50 +278,7 @@ public class Robot extends IterativeRobot {
 			shifter2.set(false);
 			shooterleft.set(0);
 			shooterright.set(0);
-			// thing.set(0);
-			// kicker.set(.5);
 		}
-		/*
-		 * if(joystick.getRawButton(ABUTTON) ||
-		 * joystick2.getRawButton(ABUTTON)){ //setpoint+= 10; //
-		 * pid.setSetpoint(setpoint); arm.set(1);
-		 * System.out.println(encoder.get()); }else
-		 * if(joystick.getRawButton(BBUTTON) ||
-		 * joystick2.getRawButton(BBUTTON)){ //setpoint-= 10;
-		 * //pid.setSetpoint(setpoint); arm.set(-1);
-		 * System.out.println(encoder.get());
-		 * 
-		 * }else{ //pid.setSetpoint(setpoint); arm.set(0);
-		 * System.out.println(encoder.get());
-		 * 
-		 * }
-		 */
-
-		/*
-		 * if(joystick.getRawButton(ABUTTON) ||
-		 * joystick2.getRawButton(ABUTTON)){ int setpoint = 800; int
-		 * currentcount = encoder.get(); if(currentcount < 10){ arm.set(OFF);
-		 * System.out.println(currentcount); }else if((currentcount) >= 10 &&
-		 * (currentcount) < (setpoint - 100)){ arm.set(HIGH);
-		 * System.out.println(currentcount); }else if ((currentcount) >=
-		 * (setpoint - 100) && (currentcount) < setpoint){ arm.set(LOW);
-		 * System.out.println(currentcount); }else{ arm.set(OFF);
-		 * System.out.println(currentcount); } }else
-		 * if(joystick.getRawButton(LBUMPER) ||
-		 * joystick2.getRawButton(LBUMPER)){ int setpoint = -200; int
-		 * currentcount = .get(); if(currentcount > -10){ arm.set(OFF);
-		 * System.out.println(currentcount); }else if((currentcount) <= -10 &&
-		 * (currentcount) > (setpoint + 100)){ arm.set(-1*HIGH);
-		 * System.out.println(currentcount); }else if ((currentcount) >=
-		 * (setpoint + 100) && (currentcount) > setpoint){ arm.set(-1*LOW);
-		 * System.out.println(currentcount); }else{ arm.set(OFF);
-		 * System.out.println(currentcount); } }else{ if(joystick.getThrottle()
-		 * > 0.1 || joystick.getThrottle() < -0.1){
-		 * arm.set(joystick.getThrottle()); System.out.println(.get()); }else
-		 * if(joystick2.getThrottle() > 0.1 || joystick2.getThrottle() < -0.1){
-		 * arm.set(joystick2.getThrottle()); System.out.println(encoder.get());
-		 * }else{ arm.set(OFF); } }
-		 */
 
 	}
 
