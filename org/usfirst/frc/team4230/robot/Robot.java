@@ -61,7 +61,7 @@ public class Robot extends IterativeRobot {
 	///////////////////////////////////////
 	public final int ZERO = -125;
 	public final int SHOOT = -1200;
-	int setpoint;
+	double setpoint;
 	int autoloop;
 
 	Joystick joystick; // telling the code that the joystick(s) exist
@@ -219,7 +219,7 @@ public class Robot extends IterativeRobot {
 		  }else if(joystick2.getRawButton(YBUTTON)){
 			  setpoint = SHOOT;	
 		  }else{
-		      arm.set(arm.getPosition()); 
+			  setpoint = arm.getPosition(); 
 		  }
 		  
 		  arm.set(setpoint);
