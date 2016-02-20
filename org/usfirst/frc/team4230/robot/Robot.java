@@ -4,8 +4,12 @@ package org.usfirst.frc.team4230.robot;
 import org.usfirst.frc.team4230.robot.commands.ExampleCommand;
 import org.usfirst.frc.team4230.robot.subsystems.ExampleSubsystem;
 
+import com.ni.vision.NIVision;
+import com.ni.vision.NIVision.Image;
+
 import edu.wpi.first.wpilibj.CANSpeedController.ControlMode;
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.CANTalon.FeedbackDevice;
 import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.Compressor;
@@ -60,7 +64,7 @@ public class Robot extends IterativeRobot {
 	public final int R3BUTTON = 12;
 	///////////////////////////////////////
 	public final int ZERO = -125;
-	public final int SHOOT = -1200;
+	public final int SHOOT = -1400;
 	double setpoint;
 	int autoloop;
 
@@ -83,6 +87,9 @@ public class Robot extends IterativeRobot {
 	Command autonomousCommand;// these are included in the code by default,
 	SendableChooser chooser;// don't delete them
 	int speed;
+	int session;
+	double currentposition;
+	Image frame;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -120,6 +127,10 @@ public class Robot extends IterativeRobot {
 		speed = 0;
 		setpoint = 0;
 		autoloop = 0;
+		currentposition = 0;
+		frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
+		session = NIVision.IMAQdxOpenCamera("cam0", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+		NIVision.IMAQdxConfigureGrab(session);
 		chooser = new SendableChooser();
 		chooser.addDefault("Default Auto", new ExampleCommand());
 		// chooser.addObject("My Auto", new MyAutoCommand());
@@ -211,43 +222,65 @@ public class Robot extends IterativeRobot {
 	 */
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-		System.out.println(arm.getEncPosition() + " " + arm.getPosition() + " " + arm.getClosedLoopError()+ " " + setpoint);
-		// drive.tankDrive(joystick.getY()*.75, joystick.getThrottle()*.75);
-		
-		if(joystick2.getRawButton(BBUTTON)){ 
-			  setpoint = ZERO; 
-		  }else if(joystick2.getRawButton(YBUTTON)){
-			  setpoint = SHOOT;	
-		  }else{
-			  setpoint = arm.getPosition(); 
-		  }
-		  
-		  arm.set(setpoint);
-		 
-		drive.arcadeDrive(joystick.getY() * .75, joystick.getX() * .75);
-		
-		if (joystick2.getRawButton(RTRIGGER)) {
-			kicker.set(-1);
-		} else {
-			kicker.set(1);
-		}
+		NIVision.IMAQdxStartAcquisition(session);
 
-		if (joystick2.getRawButton(LTRIGGER)) {
-			shooterright.set(1);
-			shooterleft.set(-1);
-		} else if (joystick2.getRawButton(LBUMPER)) {
-			shooterright.set(-.7);
-			shooterleft.set(.7);
-		} else if (joystick.getRawButton(RBUMPER)) {
-			shifter1.set(false);
-			shifter2.set(true);
-		} else {
-			shifter1.set(true);
-			shifter2.set(false);
-			shooterleft.set(0);
-			shooterright.set(0);
-		}
+		/**
+		 * grab an image, draw the circle, and provide it for the camera server
+		 * which will in turn send it to the dashboard.
+		 */
+		NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
+		while (isOperatorControl() && isEnabled()) {
+			NIVision.IMAQdxGrab(session, frame, 1);
+		//	NIVision.imaqDrawShapeOnImage(frame, frame, rect,
+			//		DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
 
+            CameraServer.getInstance().setImage(frame);
+        	System.out.println(arm.getEncPosition() + " " + arm.getPosition() + " " + arm.getClosedLoopError()+ " " + setpoint);
+    	//	drive.tankDrive(joystick.getY() * .75, joystick.getThrottle() * .75);
+    		
+    		if(joystick2.getRawButton(BBUTTON)){ 
+    			  setpoint = ZERO; 
+    			  currentposition = arm.getPosition();
+    		  }else if(joystick2.getRawButton(YBUTTON)){
+    			  setpoint = SHOOT;	
+    			  currentposition = arm.getPosition();
+    		  }else if(joystick2.getRawButton(ABUTTON)){
+    			  setpoint = 200;
+    			  currentposition = arm.getPosition();
+    		  }else{
+    			  setpoint = currentposition;
+    		  }
+    		  
+    		  arm.set(setpoint);
+    		
+    		drive.arcadeDrive(joystick.getY() * .75, joystick.getX() * .75);
+    		
+    		if (joystick2.getRawButton(RTRIGGER)) {
+    			kicker.set(-1);
+    		} else {
+    			kicker.set(1);
+    		}
+
+    		if (joystick.getRawButton(RBUMPER)) {
+    			shifter1.set(false);
+    			shifter2.set(true);
+    		} else {
+    			shifter1.set(true);
+    			shifter2.set(false);
+    		}
+    		
+    		if (joystick2.getRawButton(LTRIGGER)) {
+    			shooterright.set(1);
+    			shooterleft.set(-1);
+    		} else if (joystick2.getRawButton(LBUMPER)) {
+    			shooterright.set(-.7);
+    			shooterleft.set(.7);
+    		}else {
+    			shooterleft.set(0);
+    			shooterright.set(0);
+    		}
+		}
+		NIVision.IMAQdxStopAcquisition(session);
 	}
 
 	/**
