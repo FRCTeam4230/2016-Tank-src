@@ -37,18 +37,14 @@ public class Robot extends IterativeRobot {
 
 	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 	public static OI oi;
-	public final int LDRIVE1 = 0; // pwm different motors are in, allows
-	// public final int LDRIVE2 = 1; // you to just change pwm port in one place
-	// if
-	// public final int LDRIVE3 = 2;// electrical moves stuff on you
-	// public final int RDRIVE1 = 3;
-	// public final int RDRIVE2 = 4;
-	// public final int RDRIVE3 = 5;
-	public final int THROWL = 7;
-	public final int THROWR = 8;
-	public final int PICKUP = 6;
+	public final int LEFTFRONT = 1; 
+	public final int LEFTBACK = 2; 	
+	public final int RIGHTFRONT = 3;
+	public final int RIGHTBACK = 4;
+	public final int SHOOTERLEFT = 5;
+	public final int SHOOTERRIGHT = 6;
+	public final int ARM = 7;
 	public final int KICKER = 3;
-	public final int ARM = 1;
 	///////////////////////////////////////////
 	public final int XBUTTON = 1;// different button numbers, buttons on
 	public final int YBUTTON = 4;// controllers are randomly assigned a
@@ -63,10 +59,6 @@ public class Robot extends IterativeRobot {
 	public final int L3BUTTON = 11;
 	public final int R3BUTTON = 12;
 	///////////////////////////////////////
-	public final int DEADBAND = 10;
-	public final double OFF = -0.12;
-	public final double LOW = 0.1;
-	public final double HIGH = 0.4;
 	public final int ZERO = 0;
 	public final int SHOOT = -1200;
 	int setpoint;
@@ -76,17 +68,8 @@ public class Robot extends IterativeRobot {
 	RobotDrive drive; // same as above but for drive train
 	Compressor air; // compressor for pneumatics
 	Solenoid shifter1; // valve for pneumatics, makes pneumatic actuator
-						// (thingy)
-	// go in and out
-	Solenoid shifter2;
+	Solenoid shifter2; // (thingy) go in and out
 	PIDController pid;
-	// SpeedController leftdrive; // extra motors (drive motors don't usually
-	// need
-	// to
-	// SpeedController rightdrive;// be declared up here, they are declared with
-	// robot drive)
-
-	// SpeedController arm;
 	int auto;
 	CANTalon leftfront;
 	CANTalon leftback;
@@ -95,11 +78,6 @@ public class Robot extends IterativeRobot {
 	CANTalon shooterleft;
 	CANTalon shooterright;
 	CANTalon arm;
-	Encoder driverenc;// declaring all of the encoders for the robot
-	Encoder drivelenc;
-	Encoder throwrenc;
-	Encoder encoder;
-	Encoder armposenc;
 	Servo kicker;// servo motor
 	Command autonomousCommand;// these are included in the code by default,
 	SendableChooser chooser;// don't delete them
@@ -111,77 +89,39 @@ public class Robot extends IterativeRobot {
 	 */
 	public void robotInit() {
 		oi = new OI();
-		// leftdrive = new MultiController(new Talon(LDRIVE1), new
-		// Talon(LDRIVE2), new Talon(LDRIVE3));
-		// rightdrive = new MultiController(new Talon(RDRIVE1), new
-		// Talon(RDRIVE2), new Talon(RDRIVE3));
-		leftfront = new CANTalon(1);
-		leftback = new CANTalon(2);
-		rightfront = new CANTalon(3);
-		rightback = new CANTalon(4);
+		
+		leftfront = new CANTalon(LEFTFRONT);
+		leftback = new CANTalon(LEFTBACK);
+		rightfront = new CANTalon(RIGHTFRONT);
+		rightback = new CANTalon(RIGHTBACK);
 		drive = new RobotDrive(leftfront, leftback, rightfront, rightback);
 		joystick = new Joystick(0);
 		joystick2 = new Joystick(1);
-		shooterleft = new CANTalon(5);
-		shooterright = new CANTalon(6);
-		// arm = new Talon(ARM);
-		// thing = new CANTalon(2);
-		// thing.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+		shooterleft = new CANTalon(SHOOTERLEFT);
+		shooterright = new CANTalon(SHOOTERRIGHT);
 		kicker = new Servo(KICKER);
-		encoder = new Encoder(0, 1, false);
-		encoder.reset();
-		// throwrenc = new Encoder(2, 3);
-		// armposenc = new Encoder(4, 5);
-		// driverenc = new Encoder(6, 7);
-		// drivelenc = new Encoder(8, 9);
 		air = new Compressor(0);
 		air.start();
 		shifter1 = new Solenoid(0);
 		shifter2 = new Solenoid(1);
-		arm = new CANTalon(7);
+		arm = new CANTalon(ARM);
 		arm.clearStickyFaults();
 		arm.changeControlMode(TalonControlMode.Position);
 		arm.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-		// arm.configEncoderCodesPerRev(360);
 		arm.setPosition(0);
 		arm.setForwardSoftLimit(1.0);
 		arm.setReverseSoftLimit(-1.0);
 		arm.reverseSensor(false);
-		// arm.reverseOutput(false);
-		// arm.reverseOutput(true);
-		// arm.setEncPosition(0);
 		arm.setVoltageRampRate(0);
 		arm.setP(2.5);
 		arm.setI(0.001);
 		arm.setD(0);
-		// arm.setAllowableClosedLoopErr(100);
-
-		// arm.set(0);
-		// try {
-		// Thread.sleep(500);
-		// } catch (InterruptedException e) {
-		// TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// arm.setPosition(0);
 		speed = 0;
-		// armr2 = new Talon(6);
-		// arml1 = new Talon(8);
-		// arml2 = new Talon(9);
-		// pid = new PIDController(1000, 0, 0, encoder, arm);
 		setpoint = 0;
-		// arm.changeControlMode(TalonControlMode.Position);
-		// arm.setSetpoint(setpoint);
-		// arm.setPID(1, 0, 0);
-		// arm.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-		// pid.setContinuous();
 		chooser = new SendableChooser();
 		chooser.addDefault("Default Auto", new ExampleCommand());
 		// chooser.addObject("My Auto", new MyAutoCommand());
 		SmartDashboard.putData("Auto mode", chooser);
-		// drive.setInvertedMotor(MotorType.kFrontLeft, true);
-		// drive.setInvertedMotor(MotorType.kRearLeft, true);
-
 	}
 
 	/**
@@ -245,14 +185,8 @@ public class Robot extends IterativeRobot {
 	 */
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-		// System.out.println(arm.getEncPosition());
-		// arm.set(joystick.getThrottle());
 		System.out.println(arm.getEncPosition() + " " + arm.getPosition() + " " + arm.getClosedLoopError()+ " " + setpoint);
-		// System.out.println(arm.getPosition());
-		// System.out.println(joystick.getZ());
 		// drive.tankDrive(joystick.getY()*.75, joystick.getThrottle()*.75);
-	//	arm.set(arm.getPosition());
-
 		
 		if(joystick2.getRawButton(BBUTTON)){ 
 			  setpoint = ZERO; 
