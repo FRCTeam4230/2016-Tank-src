@@ -59,9 +59,10 @@ public class Robot extends IterativeRobot {
 	public final int L3BUTTON = 11;
 	public final int R3BUTTON = 12;
 	///////////////////////////////////////
-	public final int ZERO = 0;
+	public final int ZERO = -125;
 	public final int SHOOT = -1200;
 	int setpoint;
+	int autoloop;
 
 	Joystick joystick; // telling the code that the joystick(s) exist
 	Joystick joystick2;// but doesn't declare them yet
@@ -118,6 +119,7 @@ public class Robot extends IterativeRobot {
 		arm.setD(0);
 		speed = 0;
 		setpoint = 0;
+		autoloop = 0;
 		chooser = new SendableChooser();
 		chooser.addDefault("Default Auto", new ExampleCommand());
 		// chooser.addObject("My Auto", new MyAutoCommand());
@@ -168,6 +170,14 @@ public class Robot extends IterativeRobot {
 	 */
 	public void autonomousPeriodic() {
 		Scheduler.getInstance().run();
+		if(autoloop == 0){
+			drive.setSafetyEnabled(false);
+			drive.drive(-0.5, 0); //forward for 2 seconds
+			Timer.delay(3);
+			autoloop++;
+		}else{
+			drive.drive(0, 0);
+		}
 	}
 
 	public void teleopInit() {
