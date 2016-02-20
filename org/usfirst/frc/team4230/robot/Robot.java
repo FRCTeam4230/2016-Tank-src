@@ -175,8 +175,24 @@ public class Robot extends IterativeRobot {
 			drive.drive(-0.5, 0); //forward for 2 seconds
 			Timer.delay(3);
 			autoloop++;
+		}else if(autoloop == 1){
+			drive.drive(0.5, 1);
+			Timer.delay(1);
+			autoloop++;
+		}else if(autoloop == 2){
+			drive.drive(-0.5, 0); //forward for 2 seconds
+			Timer.delay(2);
+			autoloop++;
+		}else if(autoloop == 3){
+			arm.set(SHOOT);
+			Timer.delay(2);
+			kicker.set(-1);
+			Timer.delay(1);
+			autoloop++;
 		}else{
 			drive.drive(0, 0);
+			arm.set(ZERO);
+			kicker.set(1);
 		}
 	}
 
