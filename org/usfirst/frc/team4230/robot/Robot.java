@@ -67,6 +67,8 @@ public class Robot extends IterativeRobot {
 	public final double OFF = -0.12;
 	public final double LOW = 0.1;
 	public final double HIGH = 0.4;
+	public final int ZERO = 0;
+	public final int SHOOT = -1200;
 	int setpoint;
 
 	Joystick joystick; // telling the code that the joystick(s) exist
@@ -149,7 +151,9 @@ public class Robot extends IterativeRobot {
 		// arm.reverseOutput(true);
 		// arm.setEncPosition(0);
 		arm.setVoltageRampRate(0);
-		arm.setP(1.0);
+		arm.setP(2.5);
+		arm.setI(0.001);
+		arm.setD(0);
 		// arm.setAllowableClosedLoopErr(100);
 
 		// arm.set(0);
@@ -165,7 +169,7 @@ public class Robot extends IterativeRobot {
 		// arml1 = new Talon(8);
 		// arml2 = new Talon(9);
 		// pid = new PIDController(1000, 0, 0, encoder, arm);
-		setpoint = 200;
+		setpoint = 0;
 		// arm.changeControlMode(TalonControlMode.Position);
 		// arm.setSetpoint(setpoint);
 		// arm.setPID(1, 0, 0);
@@ -243,19 +247,23 @@ public class Robot extends IterativeRobot {
 		Scheduler.getInstance().run();
 		// System.out.println(arm.getEncPosition());
 		// arm.set(joystick.getThrottle());
-		System.out.println(arm.getEncPosition() + " " + arm.getPosition() + " " + arm.getClosedLoopError());
+		System.out.println(arm.getEncPosition() + " " + arm.getPosition() + " " + arm.getClosedLoopError()+ " " + setpoint);
 		// System.out.println(arm.getPosition());
 		// System.out.println(joystick.getZ());
 		// drive.tankDrive(joystick.getY()*.75, joystick.getThrottle()*.75);
-		arm.set(arm.getPosition());
+	//	arm.set(arm.getPosition());
 
-		/*
-		 * if(joystick.getRawButton(ABUTTON) ||
-		 * joystick2.getRawButton(ABUTTON)){ arm.set(2); }else
-		 * if(joystick.getRawButton(YBUTTON) ||
-		 * joystick2.getRawButton(YBUTTON)){ arm.set(-2.0); }else{
-		 * arm.set(arm.getPosition()); }
-		 */
+		
+		if(joystick2.getRawButton(BBUTTON)){ 
+			  setpoint = ZERO; 
+		  }else if(joystick2.getRawButton(YBUTTON)){
+			  setpoint = SHOOT;	
+		  }else{
+		      arm.set(arm.getPosition()); 
+		  }
+		  
+		  arm.set(setpoint);
+		 
 		drive.arcadeDrive(joystick.getY() * .75, joystick.getX() * .75);
 		
 		if (joystick2.getRawButton(RTRIGGER)) {
@@ -268,8 +276,8 @@ public class Robot extends IterativeRobot {
 			shooterright.set(1);
 			shooterleft.set(-1);
 		} else if (joystick2.getRawButton(LBUMPER)) {
-			shooterright.set(-.4);
-			shooterleft.set(.4);
+			shooterright.set(-.7);
+			shooterleft.set(.7);
 		} else if (joystick.getRawButton(RBUMPER)) {
 			shifter1.set(false);
 			shifter2.set(true);
